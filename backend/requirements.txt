@@ -1,0 +1,22 @@
+# Core FastAPI requirements
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Kafka
+kafka-python==2.0.2
+
+# Database
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+
+# Async support
+httpx==0.26.0
+
+# Data validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+
+# Note: Airflow dependencies are handled by the Airflow Docker image
+# Only add shared dependencies that both FastAPI and Airflow DAGs need
