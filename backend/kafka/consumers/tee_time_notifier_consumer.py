@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""
-Kafka consumer that processes tee time search requests and sends notifications
-when matching tee times become available.
-
-This consumer listens to the 'tee-time-searches' topic and processes search requests
-by checking for available tee times and sending email/SMS notifications to users.
-"""
+"""Consume tee-time search events and trigger notifications."""
 import json
 import logging
 import os
@@ -36,12 +30,7 @@ CONSUMER_GROUP = 'tee-time-notifier-group'
 
 
 def process_search_message(message):
-    """
-    Process a single tee time search message from Kafka.
-
-    Args:
-        message: Kafka message containing search request data
-    """
+    """Handle one Kafka message containing a tee time search."""
     try:
         # Parse message value
         search_data = json.loads(message.value.decode('utf-8'))
@@ -77,9 +66,7 @@ def process_search_message(message):
 
 
 def run_consumer():
-    """
-    Run the Kafka consumer to process tee time search requests.
-    """
+    """Start the Kafka consumer loop."""
     logger.info(f"Starting Tee Time Notifier Consumer")
     logger.info(f"Kafka Bootstrap Servers: {KAFKA_BOOTSTRAP_SERVERS}")
     logger.info(f"Topic: {KAFKA_TOPIC}")
@@ -137,13 +124,7 @@ def run_consumer():
 
 
 def run_periodic_matcher():
-    """
-    Run the tee time matcher periodically to check all active searches
-    against the latest available tee times.
-
-    This runs independently of Kafka messages to ensure we catch
-    tee times that become available between Kafka messages.
-    """
+    """Periodically scan all searches for new matches."""
     logger.info("Starting Periodic Tee Time Matcher")
 
     check_interval = int(os.getenv('MATCHER_CHECK_INTERVAL', '300'))  # 5 minutes default
@@ -182,7 +163,7 @@ if __name__ == '__main__':
     elif mode == 'periodic':
         run_periodic_matcher()
     elif mode == 'both':
-        # Run both in parallel (you'd typically use threading or multiprocessing)
+        # Run both modes in parallel
         import threading
 
         consumer_thread = threading.Thread(target=run_consumer, daemon=True)

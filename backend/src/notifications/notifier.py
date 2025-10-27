@@ -1,6 +1,4 @@
-"""
-Notification service for sending email notifications.
-"""
+"""Email notification helpers."""
 import os
 import logging
 from typing import Optional
@@ -12,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class NotificationService:
-    """Service for sending email notifications."""
+    """Handle email delivery for tee time alerts."""
 
     def __init__(self):
         # Email configuration
@@ -31,18 +29,7 @@ class NotificationService:
         body_text: str,
         body_html: Optional[str] = None
     ) -> bool:
-        """
-        Send an email notification.
-
-        Args:
-            to_email: Recipient email address
-            subject: Email subject line
-            body_text: Plain text email body
-            body_html: Optional HTML email body
-
-        Returns:
-            True if email was sent successfully, False otherwise
-        """
+        """Send an email and return True on success."""
         if not self.smtp_user or not self.smtp_password:
             logger.warning("SMTP credentials not configured, skipping email")
             return False
@@ -85,21 +72,7 @@ class NotificationService:
         available_spots: int,
         group_size: int
     ) -> dict:
-        """
-        Send email notification about an available tee time.
-
-        Args:
-            user_email: User's email address
-            user_name: User's first name (optional)
-            course_name: Name of the golf course
-            tee_off_date: Date of the tee time
-            tee_off_time: Time of the tee time (Eastern Time)
-            available_spots: Number of available spots
-            group_size: Requested group size
-
-        Returns:
-            Dict with success status for email
-        """
+        """Send a single tee time email alert."""
         greeting = f"Hi {user_name}!" if user_name else "Hi!"
 
         # Create email content
@@ -201,19 +174,7 @@ Bergen County Golf Tee Time Finder
         tee_times: list,
         group_size: int
     ) -> dict:
-        """
-        Send email notification about multiple available tee times in one email.
-
-        Args:
-            user_email: User's email address
-            user_name: User's first name (optional)
-            search_id: ID of the search request
-            tee_times: List of dicts with tee time details (course_name, tee_off_date, tee_off_time, available_spots)
-            group_size: Requested group size
-
-        Returns:
-            Dict with success status for email
-        """
+        """Send one email that lists multiple matches."""
         greeting = f"Hi {user_name}!" if user_name else "Hi!"
 
         count = len(tee_times)

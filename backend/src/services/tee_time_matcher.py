@@ -1,6 +1,4 @@
-"""
-Service to match available tee times with user search requests.
-"""
+"""Match tee times against saved searches."""
 import json
 import logging
 from datetime import datetime, time
@@ -31,7 +29,7 @@ FASTAPI_DATABASE_URL = os.getenv('FASTAPI_DATABASE_URL', AIRFLOW_DATABASE_URL)
 
 
 class TeeTime:
-    """Model for tee time from Airflow database."""
+    """Lightweight view of a tee_times row."""
 
     def __init__(self, **kwargs):
         self.id = kwargs.get('id')
@@ -56,7 +54,7 @@ class TeeTime:
 
 
 class TeeTimeMatcherService:
-    """Service to match available tee times with user search requests."""
+    """Coordinate tee time matching and notifications."""
 
     def __init__(self):
         # Create engine for Airflow DB (tee_times table)
@@ -69,7 +67,7 @@ class TeeTimeMatcherService:
         self.FastAPISession = sessionmaker(bind=self.fastapi_engine)
 
     def parse_time(self, time_str: str) -> Optional[time]:
-        """Parse HH:MM time string to time object."""
+        """Return a time object for an HH:MM string."""
         if not time_str:
             return None
         try:
@@ -80,7 +78,7 @@ class TeeTimeMatcherService:
             return None
 
     def parse_date(self, date_str: str) -> Optional[datetime]:
-        """Parse various date formats to datetime."""
+        """Return a datetime parsed from accepted tee time formats."""
         if not date_str:
             return None
 
@@ -100,15 +98,7 @@ class TeeTimeMatcherService:
         return None
 
     def convert_utc_to_eastern_time_str(self, utc_time_str: str) -> str:
-        """
-        Convert UTC time string to Eastern time string for display.
-
-        Args:
-            utc_time_str: Time in HH:MM UTC format
-
-        Returns:
-            Time in HH:MM ET format
-        """
+        """Convert a UTC HH:MM string to Eastern time."""
         if not utc_time_str:
             return ""
 
@@ -133,16 +123,7 @@ class TeeTimeMatcherService:
         tee_time: TeeTime,
         search: TeeTimeSearch
     ) -> bool:
-        """
-        Check if a tee time matches a user's search criteria.
-
-        Args:
-            tee_time: Available tee time from database
-            search: User's search request
-
-        Returns:
-            True if the tee time matches the search criteria
-        """
+        """Return True if the tee time satisfies the search filters."""
         # Check course name match
         if tee_time.course_name != search.course_name:
             return False
@@ -207,17 +188,7 @@ class TeeTimeMatcherService:
         search_id: int,
         tee_time_id: str
     ) -> bool:
-        """
-        Check if a notification has already been sent for this search/tee time combo.
-
-        Args:
-            session: Database session
-            search_id: ID of the search request
-            tee_time_id: ID of the tee time
-
-        Returns:
-            True if notification was already sent
-        """
+        """Return True if this search/tee time pair already triggered a notification."""
         notification = session.query(TeeTimeNotification).filter(
             and_(
                 TeeTimeNotification.search_id == search_id,
@@ -234,18 +205,7 @@ class TeeTimeMatcherService:
         user: User,
         tee_time: TeeTime
     ) -> bool:
-        """
-        Send notification to user and record it.
-
-        Args:
-            session: Database session
-            search: User's search request
-            user: User object
-            tee_time: Matching tee time
-
-        Returns:
-            True if notification was sent successfully
-        """
+        """Send a single-match email and record the event."""
         # Convert tee off time from UTC to Eastern for display
         tee_off_time_et = self.convert_utc_to_eastern_time_str(tee_time.tee_off_time)
 
@@ -289,18 +249,7 @@ class TeeTimeMatcherService:
         user: User,
         tee_times: List[TeeTime]
     ) -> bool:
-        """
-        Send a single notification with multiple matching tee times and record them.
-
-        Args:
-            session: Database session
-            search: User's search request
-            user: User object
-            tee_times: List of matching tee times
-
-        Returns:
-            True if notification was sent successfully
-        """
+        """Send one email covering multiple matching tee times."""
         if not tee_times:
             return False
 
@@ -349,15 +298,7 @@ class TeeTimeMatcherService:
         return result['email_sent']
 
     def process_search_matches(self, search_id: Optional[int] = None) -> Dict:
-        """
-        Process all active searches and send notifications for matches.
-
-        Args:
-            search_id: Optional specific search ID to process. If None, processes all active searches.
-
-        Returns:
-            Dict with statistics about matches found and notifications sent
-        """
+        """Process active searches and send notifications for new matches."""
         fastapi_session = self.FastAPISession()
         airflow_session = self.AirflowSession()
 

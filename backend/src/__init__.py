@@ -1,1 +1,1 @@
-# Backend source module
+# Marks this directory as a package
