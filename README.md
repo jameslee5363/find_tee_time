@@ -1,6 +1,6 @@
-# Find Tee Time - Full Stack Application
+# Find Tee Time – Full Stack Application
 
-A full-stack application with React frontend and FastAPI backend, integrated with Kafka and Airflow.
+This repository contains a tee time availability tracker built with a React/TypeScript client and a FastAPI backend. Kafka moves search requests between services, while Airflow keeps the tee sheet data set fresh.
 
 ## Architecture
 
@@ -192,5 +192,4 @@ PYTHONPATH=/app/src
 - Docker support with hot-reload
 - PostgreSQL database connection
 - Airflow integration
-
 
