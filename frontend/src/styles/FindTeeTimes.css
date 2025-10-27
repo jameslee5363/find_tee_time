@@ -1,0 +1,359 @@
+.find-tee-times-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.find-tee-times-header {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  text-align: center;
+  color: white;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-4px);
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.find-tee-times-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.find-tee-times-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.find-tee-times-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tee-time-form {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.form-section h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group input[type="time"],
+.form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.field-hint {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.date-input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.date-input-group input {
+  flex: 1;
+}
+
+.add-date-button {
+  padding: 0.75rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.add-date-button:hover:not(:disabled) {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.add-date-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.selected-dates {
+  margin-top: 1rem;
+}
+
+.selected-dates label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.date-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.date-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+  border-radius: 20px;
+  color: #5b21b6;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.remove-date-button {
+  background: none;
+  border: none;
+  color: #7c3aed;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.remove-date-button:hover {
+  background: #c4b5fd;
+  color: #5b21b6;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.alert svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.alert-error svg {
+  color: #dc2626;
+}
+
+.alert-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.alert-success svg {
+  color: #16a34a;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cancel-button,
+.submit-button {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cancel-button {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.submit-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-button:disabled,
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .find-tee-times-container {
+    padding: 1rem;
+  }
+
+  .find-tee-times-header h1 {
+    font-size: 2rem;
+  }
+
+  .tee-time-form {
+    padding: 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .date-input-group {
+    flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-button,
+  .submit-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

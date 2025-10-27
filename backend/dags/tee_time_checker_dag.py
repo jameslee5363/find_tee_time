@@ -574,7 +574,7 @@ def save_tee_times_to_database(**context):
                         'is_online_bookable': not slot.get('isNotAllowTwosomeBooking', False),
                         'is_available': True,  # Mark as available since we just fetched it
                         'raw_data': slot,
-                        'updated_at': datetime.now()
+                        'updated_at': datetime.utcnow()
                     }
 
                     # Use insert with on_conflict_do_update to handle duplicates
@@ -596,7 +596,7 @@ def save_tee_times_to_database(**context):
                     if result.rowcount > 0:
                         # Check if we're updating existing record
                         existing = session.query(TeeTime).filter_by(tee_time_id=tee_time_id).first()
-                        if existing and existing.created_at < datetime.now() - timedelta(seconds=1):
+                        if existing and existing.created_at < datetime.utcnow() - timedelta(seconds=1):
                             updated_count += 1
                         else:
                             saved_count += 1
@@ -617,7 +617,7 @@ def save_tee_times_to_database(**context):
         for tee_time in missing_tee_times:
             tee_time.is_available = False
             tee_time.available_spots = 0
-            tee_time.updated_at = datetime.now()
+            tee_time.updated_at = datetime.utcnow()
             marked_unavailable += 1
             logging.info(f"Marked as unavailable: {tee_time.course_name} at {tee_time.tee_off_time} on {tee_time.search_date}")
 

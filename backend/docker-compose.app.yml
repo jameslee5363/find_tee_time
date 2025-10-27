@@ -31,6 +31,8 @@ services:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
+    ports:
+      - "5433:5432"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
@@ -117,6 +119,35 @@ services:
       - internal-network
     restart: unless-stopped
     command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  tee-time-notifier:
+    build:
+      context: .
+      dockerfile: Dockerfile.notifier
+    container_name: tee-time-notifier
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      DATABASE_URL: postgresql://airflow:airflow@postgres/airflow
+      FASTAPI_DATABASE_URL: postgresql://airflow:airflow@postgres/app
+      NOTIFIER_MODE: both
+      MATCHER_CHECK_INTERVAL: 300
+      # Email configuration
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      FROM_EMAIL: ${FROM_EMAIL}
+      PYTHONPATH: /app/src
+    volumes:
+      - ./src:/app/src
+      - ./kafka:/app/kafka
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - shared-network
+      - internal-network
+    restart: unless-stopped
 
 volumes:
   postgres-db-volume:

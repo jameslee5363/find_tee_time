@@ -7,7 +7,7 @@ python-multipart==0.0.6
 kafka-python==2.0.2
 
 # Database
-sqlalchemy==2.0.25
+sqlalchemy==1.4.51
 psycopg2-binary==2.9.9
 
 # Async support
@@ -17,6 +17,12 @@ httpx==0.26.0
 pydantic==2.5.3
 pydantic-settings==2.1.0
 python-dotenv==1.0.0
+
+# Authentication & Security
+passlib==1.7.4
+bcrypt==3.2.2
+python-jose[cryptography]==3.3.0
+email-validator==2.1.0
 
 # Note: Airflow dependencies are handled by the Airflow Docker image
 # Only add shared dependencies that both FastAPI and Airflow DAGs need
