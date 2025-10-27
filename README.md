@@ -178,19 +178,19 @@ PYTHONPATH=/app/src
 ## Features
 
 ### Frontend
-- ✅ TypeScript for type safety
-- ✅ Connects to FastAPI backend
-- ✅ Displays backend status
-- ✅ Send messages to Kafka via API
-- ✅ Error handling and loading states
-- ✅ Dockerized with nginx
+- TypeScript for type safety
+- Connects to FastAPI backend
+- Displays backend status
+- Send messages to Kafka via API
+- Error handling and loading states
+- Dockerized with nginx
 
 ### Backend
-- ✅ FastAPI with async support
-- ✅ CORS configured for frontend
-- ✅ Kafka producer integration
-- ✅ Docker support with hot-reload
-- ✅ PostgreSQL database connection
-- ✅ Airflow integration
+- FastAPI with async support
+- CORS configured for frontend
+- Kafka producer integration
+- Docker support with hot-reload
+- PostgreSQL database connection
+- Airflow integration
 
 
