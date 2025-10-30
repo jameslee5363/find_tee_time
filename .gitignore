@@ -60,6 +60,8 @@ frontend/coverage/
 .env
 .env.*
 *.env
+!.env.example
+!.env.production.example
 
 # Misc runtime output
 *.pid
@@ -70,10 +72,17 @@ frontend/coverage/
 *.log
 *.out
 
-# Deployment Readme
+# Internal documentation (not for repository)
 DOCKER_DEPLOYMENT.md
 DOCKER_FIXES.md
 GETTING_STARTED.md
 SECURITY_FIXES.md
 TIMEZONE_SIMPLIFICATION.md
+
+# Database backups
+*.sql
+*.sql.gz
+*-backup.tar.gz
+postgres-data-backup.tar.gz
+kafka-data-backup.tar.gz
 
