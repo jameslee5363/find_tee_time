@@ -57,6 +57,8 @@
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .form-section {
@@ -82,6 +84,14 @@
   margin-bottom: 1.5rem;
 }
 
+.form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
 .form-group label {
   display: block;
   font-size: 0.95rem;
@@ -95,6 +105,7 @@
   margin-left: 0.25rem;
 }
 
+.form-input,
 .form-group input[type="text"],
 .form-group input[type="number"],
 .form-group input[type="date"],
@@ -107,6 +118,7 @@
   border-radius: 8px;
   transition: all 0.3s ease;
   background-color: white;
+  box-sizing: border-box;
 }
 
 .form-group select {
@@ -118,6 +130,7 @@
   padding-right: 2.5rem;
 }
 
+.form-input:focus,
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
@@ -125,11 +138,30 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.hint,
 .field-hint {
   display: block;
   font-size: 0.85rem;
   color: #6b7280;
   margin-top: 0.5rem;
+}
+
+.time-input {
+  flex: 1;
+}
+
+.number-input {
+  max-width: 200px;
+}
+
+.date-input-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.date-input-wrapper input {
+  flex: 1;
 }
 
 .date-input-group {
@@ -139,6 +171,34 @@
 
 .date-input-group input {
   flex: 1;
+}
+
+.time-range-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.time-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 140px;
+}
+
+.time-input-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.time-separator {
+  color: #718096;
+  font-weight: 500;
+  padding-top: 1.5rem;
+  user-select: none;
 }
 
 .add-date-button {
@@ -195,13 +255,15 @@
   color: #5b21b6;
   font-size: 0.9rem;
   font-weight: 500;
+  word-break: break-word;
 }
 
+.remove-chip,
 .remove-date-button {
   background: none;
   border: none;
   color: #7c3aed;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -212,8 +274,10 @@
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
+.remove-chip:hover,
 .remove-date-button:hover {
   background: #c4b5fd;
   color: #5b21b6;
@@ -223,6 +287,29 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.success-message {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
 }
 
 .alert {
@@ -334,6 +421,10 @@
     font-size: 2rem;
   }
 
+  .find-tee-times-header p {
+    font-size: 1rem;
+  }
+
   .tee-time-form {
     padding: 1.5rem;
   }
@@ -343,8 +434,26 @@
     gap: 1rem;
   }
 
+  .date-input-wrapper {
+    flex-direction: column;
+  }
+
   .date-input-group {
     flex-direction: column;
+  }
+
+  .time-range-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .time-separator {
+    padding-top: 0;
+    text-align: center;
+  }
+
+  .time-input-group {
+    min-width: 100%;
   }
 
   .form-actions {
@@ -355,5 +464,130 @@
   .submit-button {
     width: 100%;
     justify-content: center;
+  }
+
+  .submit-button {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Course Selection Styles */
+.course-selection {
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.select-all-wrapper {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.select-all-label {
+  font-weight: 700;
+  color: #667eea !important;
+  font-size: 1.05rem;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  border: 2px solid #e2e8f0;
+}
+
+.checkbox-label:hover {
+  background: #edf2f7;
+  border-color: #667eea;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-text {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.checkbox-text {
+  font-size: 0.95rem;
+  color: #2d3748;
+  user-select: none;
+  word-break: break-word;
+}
+
+.selected-count {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Responsive for checkboxes */
+@media (max-width: 640px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .checkbox-label {
+    padding: 0.625rem;
+  }
+
+  .checkbox-text {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .find-tee-times-container {
+    padding: 0.5rem;
+  }
+
+  .find-tee-times-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .find-tee-times-header p {
+    font-size: 0.95rem;
+  }
+
+  .tee-time-form {
+    padding: 1rem;
+  }
+
+  .back-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .course-selection {
+    padding: 1rem;
+  }
+
+  .add-date-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
   }
 }

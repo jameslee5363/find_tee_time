@@ -213,17 +213,23 @@ const Dashboard: React.FC = () => {
             <div className="searches-grid">
               {searches.map((search) => {
                 const dates = parsePreferredDates(search.preferred_dates);
+                const courses = parsePreferredDates(search.course_name); // Parse courses from JSON
                 return (
                   <div key={search.id} className="search-card">
                     <div className="search-card-header">
                       <div>
-                        <h3>{search.course_name}</h3>
+                        <h3>{courses.length === 1 ? courses[0] : `${courses.length} Courses`}</h3>
                         <span className={`search-status-badge ${getStatusBadgeClass(search.status)}`}>
                           {getStatusLabel(search.status)}
                         </span>
                       </div>
                     </div>
                     <div className="search-card-body">
+                      {courses.length > 1 && (
+                        <div className="search-detail">
+                          <strong>Courses:</strong> {courses.join(', ')}
+                        </div>
+                      )}
                       <div className="search-detail">
                         <strong>Dates:</strong> {dates.join(', ')}
                       </div>

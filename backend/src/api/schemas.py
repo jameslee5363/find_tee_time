@@ -62,14 +62,14 @@ class ErrorResponse(BaseModel):
 
 class TeeTimeSearchCreate(BaseModel):
     """Schema for creating a tee time search request."""
-    course_name: str
+    course_names: List[str]  # List of course names
     preferred_dates: List[str]  # List of dates in YYYY-MM-DD format
-    preferred_time_start: Optional[str] = None  # UTC time in HH:MM format
-    preferred_time_end: Optional[str] = None  # UTC time in HH:MM format
+    preferred_time_start: Optional[str] = None  # Eastern Time in HH:MM format
+    preferred_time_end: Optional[str] = None  # Eastern Time in HH:MM format
     group_size: int
 
-    @validator('course_name')
-    def validate_course_name(cls, v):
+    @validator('course_names')
+    def validate_course_names(cls, v):
         valid_courses = [
             "Valley Brook 18",
             "Darlington 18",
@@ -84,11 +84,15 @@ class TeeTimeSearchCreate(BaseModel):
             "Soldier Hill Back 9",
             "Overpeck Back 9"
         ]
-        if not v or len(v.strip()) == 0:
-            raise ValueError('Course name is required')
-        if v.strip() not in valid_courses:
-            raise ValueError(f'Invalid course name. Must be one of: {", ".join(valid_courses)}')
-        return v.strip()
+        if not v or len(v) == 0:
+            raise ValueError('At least one course name is required')
+
+        # Validate each course name
+        for course in v:
+            if course.strip() not in valid_courses:
+                raise ValueError(f'Invalid course name: {course}. Must be one of: {", ".join(valid_courses)}')
+
+        return [c.strip() for c in v]
 
     @validator('preferred_dates')
     def validate_dates(cls, v):
@@ -104,8 +108,8 @@ class TeeTimeSearchCreate(BaseModel):
 
     @validator('preferred_time_start', 'preferred_time_end')
     def validate_time(cls, v):
-        if v is None:
-            return v
+        if v is None or v == '':
+            return None  # Convert empty strings to None
         # Validate time format HH:MM
         time_pattern = re.compile(r'^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$')
         if not time_pattern.match(v):

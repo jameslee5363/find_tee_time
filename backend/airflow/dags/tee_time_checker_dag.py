@@ -406,8 +406,23 @@ def process_tee_times_task(**context):
 
         # API returns 'content' not 'data'
         slots = tee_times.get('content', tee_times.get('data', [])) if isinstance(tee_times, dict) else []
-        if slots:
+
+        # Handle case where slots might be a JSON string
+        if isinstance(slots, str):
+            try:
+                slots = json.loads(slots)
+                logging.info(f"Parsed slots from JSON string for {search_date}")
+            except Exception as e:
+                logging.warning(f"Failed to parse slots as JSON for {search_date}: {e}")
+                slots = []
+
+        if slots and isinstance(slots, list):
             for slot in slots:
+                # Skip if slot is not a dictionary
+                if not isinstance(slot, dict):
+                    logging.warning(f"Skipping non-dict slot for {search_date}: type={type(slot)}, value={str(slot)[:100]}")
+                    continue
+
                 # Extract time and check if it's morning (before noon)
                 time_str = slot.get('startTime', slot.get('teeOffTime', ''))
                 if time_str:
@@ -420,8 +435,11 @@ def process_tee_times_task(**context):
                                 'course': slot.get('courseName', 'Unknown'),
                                 'available': slot.get('availableSpots', 0)
                             })
-                    except:
+                    except Exception as e:
+                        logging.warning(f"Failed to parse time '{time_str}' for {search_date}: {e}")
                         pass
+        elif slots:
+            logging.warning(f"Slots for {search_date} is not a list: type={type(slots)}")
 
     logging.info(f"Found {len(morning_times)} morning tee times across all dates")
     for slot in morning_times[:10]:  # Log first 10

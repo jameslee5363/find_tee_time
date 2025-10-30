@@ -27,15 +27,15 @@ class User(Base):
 
 
 class TeeTimeSearch(Base):
-    """Model for storing tee time search requests. All times stored in UTC."""
+    """Model for storing tee time search requests. All times stored in Eastern Time."""
     __tablename__ = "tee_time_searches"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    course_name = Column(String(255), nullable=False, index=True)
+    course_name = Column(Text, nullable=False)  # JSON string of course name(s)
     preferred_dates = Column(Text, nullable=False)  # JSON string of date strings (YYYY-MM-DD)
-    preferred_time_start = Column(String(10))  # UTC time in HH:MM format
-    preferred_time_end = Column(String(10))  # UTC time in HH:MM format
+    preferred_time_start = Column(String(10))  # Eastern Time in HH:MM format
+    preferred_time_end = Column(String(10))  # Eastern Time in HH:MM format
     group_size = Column(Integer, nullable=False)
     status = Column(String(50), default="pending", index=True)  # pending, processing, completed, failed
     created_at = Column(DateTime(timezone=True), server_default=func.now())

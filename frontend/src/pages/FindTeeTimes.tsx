@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import teeTimeService, { TeeTimeSearchRequest } from '../services/teeTime';
+import teeTimeService from '../services/teeTime';
 import '../styles/FindTeeTimes.css';
 
 const FindTeeTimes: React.FC = () => {
@@ -8,17 +8,6 @@ const FindTeeTimes: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-
-  const [formData, setFormData] = useState<TeeTimeSearchRequest>({
-    course_name: '',
-    preferred_dates: [],
-    preferred_time_start: '',
-    preferred_time_end: '',
-    group_size: 1,
-  });
-
-  const [selectedDates, setSelectedDates] = useState<string[]>([]);
-  const [dateInput, setDateInput] = useState<string>('');
 
   const availableCourses = [
     "Valley Brook 18",
@@ -35,33 +24,39 @@ const FindTeeTimes: React.FC = () => {
     "Overpeck Back 9"
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'group_size' ? parseInt(value) || 1 : value,
-    }));
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [dateInput, setDateInput] = useState<string>('');
+  const [timeStart, setTimeStart] = useState<string>('');
+  const [timeEnd, setTimeEnd] = useState<string>('');
+  const [groupSize, setGroupSize] = useState<number>(1);
+
+  const handleSelectAllCourses = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedCourses([...availableCourses]);
+    } else {
+      setSelectedCourses([]);
+    }
+  };
+
+  const handleCourseChange = (course: string) => {
+    if (selectedCourses.includes(course)) {
+      setSelectedCourses(selectedCourses.filter(c => c !== course));
+    } else {
+      setSelectedCourses([...selectedCourses, course]);
+    }
   };
 
   const handleAddDate = () => {
     if (dateInput && !selectedDates.includes(dateInput)) {
       const newDates = [...selectedDates, dateInput].sort();
       setSelectedDates(newDates);
-      setFormData(prev => ({
-        ...prev,
-        preferred_dates: newDates,
-      }));
       setDateInput('');
     }
   };
 
   const handleRemoveDate = (dateToRemove: string) => {
-    const newDates = selectedDates.filter(date => date !== dateToRemove);
-    setSelectedDates(newDates);
-    setFormData(prev => ({
-      ...prev,
-      preferred_dates: newDates,
-    }));
+    setSelectedDates(selectedDates.filter(date => date !== dateToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,246 +67,203 @@ const FindTeeTimes: React.FC = () => {
 
     try {
       // Validate form
-      if (!formData.course_name.trim()) {
-        throw new Error('Please enter a course name');
+      if (selectedCourses.length === 0) {
+        throw new Error('Please select at least one course');
       }
 
-      if (formData.preferred_dates.length === 0) {
+      if (selectedDates.length === 0) {
         throw new Error('Please select at least one date');
       }
 
-      if (formData.group_size < 1 || formData.group_size > 4) {
+      if (groupSize < 1 || groupSize > 4) {
         throw new Error('Group size must be between 1 and 4');
       }
 
       // Submit search request
-      const response = await teeTimeService.createSearch({
-        course_name: formData.course_name,
-        preferred_dates: formData.preferred_dates,
-        preferred_time_start: formData.preferred_time_start || undefined,
-        preferred_time_end: formData.preferred_time_end || undefined,
-        group_size: formData.group_size,
+      await teeTimeService.createSearch({
+        course_names: selectedCourses,
+        preferred_dates: selectedDates,
+        preferred_time_start: timeStart || undefined,
+        preferred_time_end: timeEnd || undefined,
+        group_size: groupSize,
       });
 
       setSuccess('Your tee time search has been submitted successfully!');
 
       // Reset form after successful submission
       setTimeout(() => {
-        setFormData({
-          course_name: '',
-          preferred_dates: [],
-          preferred_time_start: '',
-          preferred_time_end: '',
-          group_size: 1,
-        });
+        setSelectedCourses([]);
         setSelectedDates([]);
+        setTimeStart('');
+        setTimeEnd('');
+        setGroupSize(1);
+        setSuccess('');
         navigate('/dashboard');
       }, 2000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || err.message || 'An error occurred');
+      setError(err.message || 'Failed to submit search. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleBackToDashboard = () => {
-    navigate('/dashboard');
-  };
+  const allCoursesSelected = selectedCourses.length === availableCourses.length;
 
   return (
     <div className="find-tee-times-container">
       <div className="find-tee-times-header">
-        <button onClick={handleBackToDashboard} className="back-button">
+        <button onClick={() => navigate('/dashboard')} className="back-button">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 12H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           Back to Dashboard
         </button>
-        <h1>Find Tee Times</h1>
-        <p>Tell us what you're looking for and we'll search for available tee times</p>
+        <h1>Find Your Perfect Tee Time</h1>
+        <p>Set your preferences and we'll notify you when matching tee times become available</p>
       </div>
 
-      <div className="find-tee-times-content">
-        <form onSubmit={handleSubmit} className="tee-time-form">
-          {error && (
-            <div className="alert alert-error">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <circle cx="12" cy="16" r="1" fill="currentColor"/>
-              </svg>
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="alert alert-success">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              {success}
-            </div>
-          )}
-
-          <div className="form-section">
-            <h2>Course Information</h2>
-
-            <div className="form-group">
-              <label htmlFor="course_name">
-                Course Name <span className="required">*</span>
-              </label>
-              <select
-                id="course_name"
-                name="course_name"
-                value={formData.course_name}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select a course...</option>
-                {availableCourses.map(course => (
-                  <option key={course} value={course}>
-                    {course}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h2>Preferred Dates</h2>
-
-            <div className="form-group">
-              <label htmlFor="date_input">
-                Select Dates <span className="required">*</span>
-              </label>
-              <div className="date-input-group">
+      <form onSubmit={handleSubmit} className="tee-time-form">
+        {/* Course Selection */}
+        <div className="form-group">
+          <label className="form-label">
+            Select Golf Courses
+            <span className="required">*</span>
+          </label>
+          <div className="course-selection">
+            <div className="select-all-wrapper">
+              <label className="checkbox-label select-all-label">
                 <input
-                  type="date"
-                  id="date_input"
-                  value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
+                  type="checkbox"
+                  checked={allCoursesSelected}
+                  onChange={handleSelectAllCourses}
                 />
-                <button
-                  type="button"
-                  onClick={handleAddDate}
-                  className="add-date-button"
-                  disabled={!dateInput}
-                >
-                  Add Date
-                </button>
-              </div>
+                <span className="checkbox-text">Select All Courses</span>
+              </label>
             </div>
-
-            {selectedDates.length > 0 && (
-              <div className="selected-dates">
-                <label>Selected Dates:</label>
-                <div className="date-chips">
-                  {selectedDates.map(date => (
-                    <div key={date} className="date-chip">
-                      <span>{new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric'
-                      })}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveDate(date)}
-                        className="remove-date-button"
-                        aria-label="Remove date"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
+            <div className="courses-grid">
+              {availableCourses.map((course) => (
+                <label key={course} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedCourses.includes(course)}
+                    onChange={() => handleCourseChange(course)}
+                  />
+                  <span className="checkbox-text">{course}</span>
+                </label>
+              ))}
+            </div>
+            {selectedCourses.length > 0 && (
+              <div className="selected-count">
+                {selectedCourses.length} course{selectedCourses.length > 1 ? 's' : ''} selected
               </div>
             )}
           </div>
+        </div>
 
-          <div className="form-section">
-            <h2>Time Preferences (Eastern Time)</h2>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="preferred_time_start">
-                  Earliest Time
-                </label>
-                <input
-                  type="time"
-                  id="preferred_time_start"
-                  name="preferred_time_start"
-                  value={formData.preferred_time_start}
-                  onChange={handleInputChange}
-                />
-                <span className="field-hint">Leave blank for any time</span>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="preferred_time_end">
-                  Latest Time
-                </label>
-                <input
-                  type="time"
-                  id="preferred_time_end"
-                  name="preferred_time_end"
-                  value={formData.preferred_time_end}
-                  onChange={handleInputChange}
-                />
-                <span className="field-hint">Leave blank for any time</span>
-              </div>
-            </div>
+        {/* Date Selection */}
+        <div className="form-group">
+          <label className="form-label">
+            Preferred Dates
+            <span className="required">*</span>
+          </label>
+          <div className="date-input-wrapper">
+            <input
+              type="date"
+              value={dateInput}
+              onChange={(e) => setDateInput(e.target.value)}
+              className="form-input"
+              min={new Date().toISOString().split('T')[0]}
+            />
+            <button type="button" onClick={handleAddDate} className="add-date-button">
+              Add Date
+            </button>
           </div>
+          {selectedDates.length > 0 && (
+            <div className="selected-dates">
+              {selectedDates.map((date) => (
+                <div key={date} className="date-chip">
+                  <span>{new Date(date + 'T00:00:00').toLocaleDateString()}</span>
+                  <button type="button" onClick={() => handleRemoveDate(date)} className="remove-chip">
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-          <div className="form-section">
-            <h2>Group Details</h2>
-
-            <div className="form-group">
-              <label htmlFor="group_size">
-                Group Size <span className="required">*</span>
-              </label>
+        {/* Time Range (Optional) */}
+        <div className="form-group">
+          <label className="form-label">
+            Preferred Time Range (Optional)
+            <span className="hint">Times in Eastern Time</span>
+          </label>
+          <div className="time-range-wrapper">
+            <div className="time-input-group">
+              <label htmlFor="preferred_time_start">From</label>
               <input
-                type="number"
-                id="group_size"
-                name="group_size"
-                value={formData.group_size}
-                onChange={handleInputChange}
-                min="1"
-                max="4"
-                required
+                type="time"
+                id="preferred_time_start"
+                value={timeStart}
+                onChange={(e) => setTimeStart(e.target.value)}
+                className="form-input time-input"
               />
-              <span className="field-hint">Number of players (1-4)</span>
+            </div>
+            <span className="time-separator">to</span>
+            <div className="time-input-group">
+              <label htmlFor="preferred_time_end">To</label>
+              <input
+                type="time"
+                id="preferred_time_end"
+                value={timeEnd}
+                onChange={(e) => setTimeEnd(e.target.value)}
+                className="form-input time-input"
+              />
             </div>
           </div>
+        </div>
 
-          <div className="form-actions">
-            <button
-              type="button"
-              onClick={handleBackToDashboard}
-              className="cancel-button"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="spinner"></span>
-                  Submitting...
-                </>
-              ) : (
-                'Search for Tee Times'
-              )}
-            </button>
+        {/* Group Size */}
+        <div className="form-group">
+          <label htmlFor="group_size" className="form-label">
+            Group Size
+            <span className="required">*</span>
+          </label>
+          <input
+            type="number"
+            id="group_size"
+            value={groupSize}
+            onChange={(e) => setGroupSize(parseInt(e.target.value) || 1)}
+            min="1"
+            max="4"
+            className="form-input number-input"
+            required
+          />
+          <p className="hint">Maximum 4 players per group</p>
+        </div>
+
+        {/* Error/Success Messages */}
+        {error && (
+          <div className="message error-message">
+            {error}
           </div>
-        </form>
-      </div>
+        )}
+
+        {success && (
+          <div className="message success-message">
+            {success}
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isSubmitting || selectedCourses.length === 0 || selectedDates.length === 0}
+          className="submit-button"
+        >
+          {isSubmitting ? 'Submitting...' : 'Create Search Request'}
+        </button>
+      </form>
     </div>
   );
 };

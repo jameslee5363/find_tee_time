@@ -144,12 +144,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  width: 100%;
+}
+
+.form-row .form-group {
+  min-width: 0;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .form-group label {
@@ -163,20 +169,23 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .input-icon {
   position: absolute;
   left: 1rem;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: #a0aec0;
   pointer-events: none;
+  flex-shrink: 0;
+  z-index: 1;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.875rem 1rem 0.875rem 3rem;
+  padding: 0.875rem 1rem;
   font-size: 1rem;
   color: #2d3748;
   background: #f7fafc;
@@ -184,6 +193,12 @@
   border-radius: 12px;
   transition: all 0.3s ease;
   outline: none;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.input-wrapper input {
+  padding-left: 3.25rem;
 }
 
 .form-group input:focus {
@@ -329,20 +344,45 @@
 
   .form-row {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .auth-shape {
     filter: blur(60px);
   }
+
+  .form-group input {
+    font-size: 0.95rem;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .auth-container {
+    padding: 0.5rem;
+  }
+
   .auth-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .auth-card.register-card {
     padding: 1.5rem 1rem;
   }
 
   .auth-header {
     margin-bottom: 2rem;
+  }
+
+  .auth-title {
+    font-size: 1.25rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.9rem;
   }
 
   .auth-icon {
@@ -353,5 +393,25 @@
   .auth-icon svg {
     width: 28px;
     height: 28px;
+  }
+
+  .form-group input {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.9rem;
+  }
+
+  .input-wrapper input {
+    padding-left: 2.875rem;
+  }
+
+  .input-icon {
+    left: 0.875rem;
+    width: 16px;
+    height: 16px;
+  }
+
+  .auth-button {
+    padding: 0.875rem;
+    font-size: 0.95rem;
   }
 }

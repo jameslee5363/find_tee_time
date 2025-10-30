@@ -33,6 +33,7 @@
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.4s ease;
+  margin: 1rem;
 }
 
 @keyframes slideUp {
@@ -142,6 +143,8 @@
   font-size: 1.1rem;
   color: #1a202c;
   margin-bottom: 0.5rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .tee-time-details {
@@ -150,6 +153,11 @@
   gap: 0.5rem;
   font-size: 0.95rem;
   color: #4a5568;
+  flex-wrap: wrap;
+}
+
+.tee-time-details span {
+  white-space: nowrap;
 }
 
 .separator {
@@ -249,6 +257,7 @@
 
   .modal-header h2 {
     font-size: 1.5rem;
+    word-wrap: break-word;
   }
 
   .modal-subtitle {
@@ -273,8 +282,44 @@
     padding: 1rem 1.5rem 1.5rem;
   }
 
+  .footer-question {
+    font-size: 1rem;
+  }
+
   .action-btn {
-    font-size: 0.95rem;
-    padding: 0.875rem 1.25rem;
+    font-size: 0.9rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .tee-time-info strong {
+    font-size: 1rem;
+  }
+
+  .tee-time-details {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header {
+    padding: 1.5rem 1rem 1rem;
+  }
+
+  .modal-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .action-btn {
+    font-size: 0.85rem;
+    padding: 0.75rem 0.875rem;
+    gap: 0.5rem;
   }
 }

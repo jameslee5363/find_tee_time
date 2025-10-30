@@ -50,15 +50,24 @@ app = FastAPI(title="Tee Time Finder API")
 security = HTTPBearer()
 
 # Configure CORS - Allow requests from frontend
+# TODO: Add your production frontend domain to allow_origins
+# Example: "https://yourdomain.com" or "https://your-app.netlify.app"
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://localhost:8000",
+]
+
+# Add production frontend URL from environment variable if set
+production_frontend_url = os.getenv("PRODUCTION_FRONTEND_URL")
+if production_frontend_url:
+    allowed_origins.append(production_frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "http://localhost:8000",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -220,11 +229,11 @@ async def create_tee_time_search(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Create a new tee time search request. Times should be provided in UTC format."""
+    """Create a new tee time search request. All times should be in Eastern Time."""
     # Create new search request
     new_search = TeeTimeSearch(
         user_id=current_user.id,
-        course_name=search_data.course_name,
+        course_name=json.dumps(search_data.course_names),  # Store as JSON array
         preferred_dates=json.dumps(search_data.preferred_dates),
         preferred_time_start=search_data.preferred_time_start,
         preferred_time_end=search_data.preferred_time_end,
@@ -242,7 +251,7 @@ async def create_tee_time_search(
             kafka_message = {
                 "search_id": new_search.id,
                 "user_id": current_user.id,
-                "course_name": search_data.course_name,
+                "course_names": search_data.course_names,
                 "preferred_dates": search_data.preferred_dates,
                 "preferred_time_start": search_data.preferred_time_start,
                 "preferred_time_end": search_data.preferred_time_end,

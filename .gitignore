@@ -70,3 +70,10 @@ frontend/coverage/
 *.log
 *.out
 
+# Deployment Readme
+DOCKER_DEPLOYMENT.md
+DOCKER_FIXES.md
+GETTING_STARTED.md
+SECURITY_FIXES.md
+TIMEZONE_SIMPLIFICATION.md
+

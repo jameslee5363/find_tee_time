@@ -67,12 +67,38 @@ class TeeTimeMatcherService:
         self.FastAPISession = sessionmaker(bind=self.fastapi_engine)
 
     def parse_time(self, time_str: str) -> Optional[time]:
-        """Return a time object for an HH:MM string."""
+        """Return a time object for an HH:MM or HH:MM:SS string."""
         if not time_str:
             return None
         try:
+            # Handle various time formats
+            # Strip any whitespace
+            time_str = time_str.strip()
+
+            # If it contains a 'T' (ISO format like "2025-10-26T14:50:00"), extract just the time part
+            if 'T' in time_str:
+                time_str = time_str.split('T')[1]
+
+            # Remove 'Z' or timezone info if present
+            if 'Z' in time_str:
+                time_str = time_str.split('Z')[0]
+            if '+' in time_str:
+                time_str = time_str.split('+')[0]
+            if '-' in time_str and time_str.count(':') >= 2:
+                # This might be timezone offset like -05:00
+                time_str = time_str.rsplit('-', 1)[0]
+
+            # Split by colon
             parts = time_str.split(':')
-            return time(hour=int(parts[0]), minute=int(parts[1]))
+            if len(parts) < 2:
+                logger.warning(f"Time string '{time_str}' doesn't have enough parts")
+                return None
+
+            # Parse hour and minute (ignore seconds if present)
+            hour = int(parts[0])
+            minute = int(parts[1])
+
+            return time(hour=hour, minute=minute)
         except Exception as e:
             logger.warning(f"Failed to parse time '{time_str}': {e}")
             return None
@@ -97,26 +123,7 @@ class TeeTimeMatcherService:
         logger.warning(f"Failed to parse date '{date_str}'")
         return None
 
-    def convert_utc_to_eastern_time_str(self, utc_time_str: str) -> str:
-        """Convert a UTC HH:MM string to Eastern time."""
-        if not utc_time_str:
-            return ""
-
-        try:
-            utc_time = self.parse_time(utc_time_str)
-            if not utc_time:
-                return utc_time_str
-
-            # Simple offset: ET is UTC-5 (EST) or UTC-4 (EDT)
-            # For simplicity, using UTC-5 (you may want to handle DST properly)
-            hour = utc_time.hour - 5
-            if hour < 0:
-                hour += 24
-
-            return f"{hour:02d}:{utc_time.minute:02d}"
-        except Exception as e:
-            logger.warning(f"Failed to convert UTC time '{utc_time_str}': {e}")
-            return utc_time_str
+    # All times are now in Eastern Time - no conversion needed
 
     def matches_search_criteria(
         self,
@@ -124,8 +131,15 @@ class TeeTimeMatcherService:
         search: TeeTimeSearch
     ) -> bool:
         """Return True if the tee time satisfies the search filters."""
-        # Check course name match
-        if tee_time.course_name != search.course_name:
+        # Parse course names from JSON
+        try:
+            course_names = json.loads(search.course_name)
+        except (json.JSONDecodeError, TypeError):
+            logger.error(f"Failed to parse course_name for search {search.id}")
+            return False
+
+        # Check if tee time course matches any of the selected courses
+        if tee_time.course_name not in course_names:
             return False
 
         # Check if tee time has enough spots for group
@@ -161,23 +175,28 @@ class TeeTimeMatcherService:
 
         # Check time range (if specified)
         if search.preferred_time_start or search.preferred_time_end:
+            # Both tee times and user searches are in Eastern Time - compare directly
             tee_off_time = self.parse_time(tee_time.tee_off_time)
+
             if not tee_off_time:
+                logger.warning(f"Could not parse tee off time '{tee_time.tee_off_time}'")
                 return False
 
-            # User searches are stored in UTC, tee_times are in ET
-            # Need to convert tee_off_time to UTC for comparison
-            # For now, assume tee_off_time is already in UTC format
-            # (This may need adjustment based on your data)
-
+            # Compare with user's Eastern Time preferences
             if search.preferred_time_start:
                 start_time = self.parse_time(search.preferred_time_start)
                 if start_time and tee_off_time < start_time:
+                    logger.debug(
+                        f"Tee time {tee_time.tee_off_time} is before start time {search.preferred_time_start}"
+                    )
                     return False
 
             if search.preferred_time_end:
                 end_time = self.parse_time(search.preferred_time_end)
                 if end_time and tee_off_time > end_time:
+                    logger.debug(
+                        f"Tee time {tee_time.tee_off_time} is after end time {search.preferred_time_end}"
+                    )
                     return False
 
         return True
@@ -206,8 +225,8 @@ class TeeTimeMatcherService:
         tee_time: TeeTime
     ) -> bool:
         """Send a single-match email and record the event."""
-        # Convert tee off time from UTC to Eastern for display
-        tee_off_time_et = self.convert_utc_to_eastern_time_str(tee_time.tee_off_time)
+        # Tee time is already in Eastern Time - use as-is
+        tee_off_time_et = tee_time.tee_off_time
 
         # Send email notification
         result = notification_service.send_tee_time_notification(
@@ -256,11 +275,11 @@ class TeeTimeMatcherService:
         # Prepare list of tee times for email
         tee_time_list = []
         for tee_time in tee_times:
-            tee_off_time_et = self.convert_utc_to_eastern_time_str(tee_time.tee_off_time)
+            # Tee time is already in Eastern Time - use as-is
             tee_time_list.append({
                 'course_name': tee_time.course_name,
                 'tee_off_date': tee_time.search_date,
-                'tee_off_time': tee_off_time_et,
+                'tee_off_time': tee_time.tee_off_time,
                 'available_spots': tee_time.available_spots
             })
 
@@ -275,14 +294,14 @@ class TeeTimeMatcherService:
 
         # Record each notification in database
         for tee_time in tee_times:
-            tee_off_time_et = self.convert_utc_to_eastern_time_str(tee_time.tee_off_time)
+            # Tee time is already in Eastern Time - use as-is
             notification = TeeTimeNotification(
                 search_id=search.id,
                 user_id=user.id,
                 tee_time_id=tee_time.tee_time_id,
                 course_name=tee_time.course_name,
                 tee_off_date=tee_time.search_date,
-                tee_off_time=tee_off_time_et,
+                tee_off_time=tee_time.tee_off_time,
                 available_spots=tee_time.available_spots,
                 email_sent=result['email_sent']
             )

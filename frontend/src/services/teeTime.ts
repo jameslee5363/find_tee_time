@@ -1,10 +1,10 @@
 import api from './api';
 
 export interface TeeTimeSearchRequest {
-  course_name: string;
+  course_names: string[];  // Array of course names
   preferred_dates: string[];  // YYYY-MM-DD format
-  preferred_time_start?: string;  // HH:MM format (will be converted to UTC)
-  preferred_time_end?: string;  // HH:MM format (will be converted to UTC)
+  preferred_time_start?: string;  // HH:MM format (Eastern Time)
+  preferred_time_end?: string;  // HH:MM format (Eastern Time)
   group_size: number;
 }
 
@@ -21,64 +21,18 @@ export interface TeeTimeSearchResponse {
   updated_at: string;
 }
 
-/**
- * Convert Eastern time to UTC time
- * @param timeStr Time in HH:MM format (Eastern)
- * @param dateStr Date in YYYY-MM-DD format
- * @returns Time in HH:MM format (UTC)
- */
-const convertEasternToUTC = (timeStr: string, dateStr: string): string => {
-  // Create a date object in Eastern time
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  const dateTime = new Date(`${dateStr}T${timeStr}:00-05:00`); // EST offset
-
-  // Get UTC hours and minutes
-  const utcHours = dateTime.getUTCHours().toString().padStart(2, '0');
-  const utcMinutes = dateTime.getUTCMinutes().toString().padStart(2, '0');
-
-  return `${utcHours}:${utcMinutes}`;
-};
-
-/**
- * Convert UTC time to Eastern time
- * @param timeStr Time in HH:MM format (UTC)
- * @returns Time in HH:MM format (Eastern)
- */
-export const convertUTCToEastern = (timeStr: string, dateStr: string = '2024-01-01'): string => {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  const dateTime = new Date(`${dateStr}T${timeStr}:00Z`); // UTC
-
-  // Convert to Eastern time string
-  const easternTime = dateTime.toLocaleString('en-US', {
-    timeZone: 'America/New_York',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
-
-  return easternTime;
-};
+// All times are stored and transmitted in Eastern Time (no conversion needed)
 
 class TeeTimeService {
   /**
    * Create a new tee time search request
-   * Note: Times in the request are in Eastern time and will be converted to UTC
+   * Note: All times are in Eastern Time
    */
   async createSearch(searchData: TeeTimeSearchRequest): Promise<TeeTimeSearchResponse> {
-    // Convert Eastern times to UTC before sending to backend
-    const utcSearchData = {
-      ...searchData,
-      preferred_time_start: searchData.preferred_time_start
-        ? convertEasternToUTC(searchData.preferred_time_start, searchData.preferred_dates[0])
-        : undefined,
-      preferred_time_end: searchData.preferred_time_end
-        ? convertEasternToUTC(searchData.preferred_time_end, searchData.preferred_dates[0])
-        : undefined,
-    };
-
+    // Send times as-is (Eastern Time)
     const response = await api.post<TeeTimeSearchResponse>(
       '/api/tee-times/search',
-      utcSearchData
+      searchData
     );
     return response.data;
   }

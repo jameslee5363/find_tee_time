@@ -84,6 +84,8 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .welcome-section p {
@@ -141,12 +143,16 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: #1a202c;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .user-info p {
   margin: 0;
   font-size: 1rem;
   color: #718096;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .user-card-body {
@@ -161,6 +167,13 @@
   gap: 0.75rem;
   color: #4a5568;
   font-size: 0.95rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.user-detail span {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .user-detail svg {
@@ -302,6 +315,10 @@
     font-size: 1rem;
   }
 
+  .nav-logo span {
+    display: none;
+  }
+
   .nav-logo svg {
     width: 28px;
     height: 28px;
@@ -310,6 +327,10 @@
   .logout-button {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
+  }
+
+  .logout-button span {
+    display: none;
   }
 
   .dashboard-content {
@@ -346,6 +367,14 @@
 }
 
 @media (max-width: 480px) {
+  .nav-content {
+    padding: 0.75rem 1rem;
+  }
+
+  .dashboard-content {
+    padding: 1.5rem 1rem;
+  }
+
   .welcome-section h1 {
     font-size: 1.5rem;
   }
@@ -360,6 +389,10 @@
 
   .feature-card {
     padding: 1.5rem;
+  }
+
+  .search-card {
+    padding: 1.25rem;
   }
 }
 
@@ -469,6 +502,8 @@
   font-size: 1.25rem;
   color: #1a202c;
   margin: 0 0 0.5rem 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .search-status-badge {
@@ -508,11 +543,14 @@
   color: #4a5568;
   margin: 0.5rem 0;
   line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .search-detail strong {
   color: #2d3748;
   margin-right: 0.5rem;
+  white-space: nowrap;
 }
 
 .search-card-actions {
@@ -553,11 +591,38 @@
     font-size: 1.25rem;
   }
 
+  .btn-primary {
+    width: 100%;
+  }
+
   .searches-grid {
     grid-template-columns: 1fr;
   }
 
   .active-searches-section {
     padding: 1.5rem;
+  }
+
+  .search-card-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .search-detail {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .active-searches-section {
+    padding: 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .btn-primary {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
   }
 }

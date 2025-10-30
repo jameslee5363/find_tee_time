@@ -192,4 +192,4 @@ PYTHONPATH=/app/src
 - Docker support with hot-reload
 - PostgreSQL database connection
 - Airflow integration
-
+ 
